@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)https://v3.bootcss.com/examples/offcanvas/# -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/antgo.ico">
+
+    <title>Proxy</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+    <style>
+        /*
+ * Style tweaks
+ * --------------------------------------------------
+ */
+html,
+body {
+  overflow-x: hidden; /* Prevent scroll on narrow devices */
+}
+body {
+  padding-top: 70px;
+}
+footer {
+  padding: 30px 0;
+}
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 767px) {
+    .row-offcanvas {
+        position: relative;
+        -webkit-transition: all .25s ease-out;
+        -o-transition: all .25s ease-out;
+        transition: all .25s ease-out;
+    }
+
+    .row-offcanvas-right {
+        right: 0;
+    }
+
+    .row-offcanvas-left {
+        left: 0;
+    }
+
+    .row-offcanvas-right
+    .sidebar-offcanvas {
+        right: -50%; /* 6 columns */
+    }
+
+    .row-offcanvas-left
+    .sidebar-offcanvas {
+        left: -50%; /* 6 columns */
+    }
+
+    .row-offcanvas-right.active {
+        right: 50%; /* 6 columns */
+    }
+
+    .row-offcanvas-left.active {
+        left: 50%; /* 6 columns */
+    }
+
+    .sidebar-offcanvas {
+        position: absolute;
+        top: 0;
+        width: 50%; /* 6 columns */
+    }
+
+}
+.login-form-box {
+    margin-top: 100px;
+    background: url('/static/body.png') 0 0;
+    -webkit-background-size: cover;
+    background-size: cover;
+    text-align: center;
+    height: 300px;
+    background-repeat: no-repeat;
+    color: #888;
+}
+
+.login-form-box input[type="text"], .login-form-box input[type="password"] {
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    vertical-align: middle;
+    background: #fff;
+    border: 3px solid #fff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 50px;
+    color: #888;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -o-transition: all .3s;
+    -moz-transition: all .3s;
+    -webkit-transition: all .3s;
+    -ms-transition: all .3s;
+    transition: all .3s;
+}
+.login-form-box .form-bottom button.btn {
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    vertical-align: middle;
+    background: #20BEFF;
+    border: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 50px;
+    color: #fff;
+
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    text-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -o-transition: all .3s;
+    -moz-transition: all .3s;
+    -webkit-transition: all .3s;
+    -ms-transition: all .3s;
+    transition: all .3s;
+}
+.login-form-box .form-foot button.btn {
+    height: 40px;
+    width: 150px;
+    padding: 0 20px;
+    vertical-align: middle;
+    background: #20BEFF;
+    border: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: bolder;
+    line-height: 50px;
+    color: #fff;
+
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    text-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -o-transition: all .3s;
+    -moz-transition: all .3s;
+    -webkit-transition: all .3s;
+    -ms-transition: all .3s;
+    transition: all .3s;
+    margin-top: 10px;
+}
+
+.form-top {
+	overflow: hidden;
+	padding: 0 25px 15px 25px;
+	-moz-border-radius: 4px 4px 0 0; -webkit-border-radius: 4px 4px 0 0; border-radius: 4px 4px 0 0;
+	text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-top-left {
+	float: left;
+	width: 75%;
+	padding-top: 25px;
+}
+
+.form-top-left h3 { margin-top: 0; color: #888;}
+
+.form-top-right {
+	float: left;
+	width: 25%;
+	padding-top: 5px;
+	font-size: 66px;
+	color: #888;
+	line-height: 100px;
+	text-align: right;
+}
+
+.form-top-center{
+    width: 75%;
+    margin-left: 64px;
+    float: left;
+    margin-top: -60px;
+}
+.form-top-center img{
+    width: 60px;
+    height:60px;
+    margin-top: 30px;
+}
+.form-top-center h4 {
+    margin-top: 0;
+    color: #888;
+    margin-bottom: -10px;
+    margin-top: 20px;
+    font-weight: bolder;
+    margin-left: -335px;
+}
+
+.form-bottom {
+	-moz-border-radius: 0 0 4px 4px; -webkit-border-radius: 0 0 4px 4px; border-radius: 0 0 4px 4px;
+	text-align: center;
+    width: 70%;
+    margin: 0 auto;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.form-bottom form textarea {
+	height: 100px;
+}
+
+.form-bottom form button.btn {
+	width: 100%;
+}
+
+
+.modal {
+    overflow-y: auto;
+}
+    </style>
+
+    <script>
+    $(document).ready(function () {
+      $('[data-toggle="offcanvas"]').click(function () {
+        $('.row-offcanvas').toggleClass('active')
+      });
+
+      $('button[name=operate_btn]').each(function(){
+          $(this).on('click', function(){
+              var id = $(this).attr('id');
+              var clicked_button = $(this);
+              $.post('../stop/',
+                  {'id':id, 'operate_type': 'STOP'},
+                  function(data, status){
+                    // pass
+                    if(status=='success'){
+                        clicked_button.parent().parent().remove()
+                    }
+                    else{
+                        alert('couldnt stop proxy server')
+                    }
+              })
+          })
+      })
+
+      $('#login').on('click',function(){
+          var btn = $(this);
+          // $.post('../login/',{'username':'mmm','passward':'123'}, function(data, status){
+          //     if(status == 'success'){
+          //         btn.text('OK');
+          //     }
+          // })
+          $('#login_modal').modal()
+      })
+    });
+
+    </script>
+  </head>
+
+  <body style="">
+    <nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="https://v3.bootcss.com/examples/offcanvas/#">Ant Proxy</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="https://v3.bootcss.com/examples/offcanvas/#">首页</a></li>
+            <li><a href="https://v3.bootcss.com/examples/offcanvas/#about">关于</a></li>
+            <li><a href="https://v3.bootcss.com/examples/offcanvas/#contact">联系</a></li>
+            {%if log_status%}
+            <li><button id="login" href="javascript:void(0)">登出</button></li>
+            {%else%}
+            <li><button id="login" href="javascript:void(0)">登录</button></li>
+            {%end%}
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+    <div id="login_modal" class = "modal fade" role="dialog" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content login-form-box">
+            <div class="form-top">
+                <div class="form-top-left">
+                    <h3>欢迎来到AntProxy</h3>
+                </div>
+                <div class="form-top-right">
+                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                </div>
+                <div class="form-top-center">
+                    <h4>登录</h4>
+                    <a href="javascript:void(0)" style="color: gray;"><i class="fa fa-github fa-4x" aria-hidden="true" id = "login-by-github" style="margin-top: 30px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="container">
+      <div class="row row-offcanvas row-offcanvas-right">
+        <div class="col-xs-12 col-sm-9">
+          <p class="pull-right visible-xs">
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+          </p>
+          <div class="jumbotron">
+            <h1>Hi, Ant Proxy</h1>
+            <p>This is an example to show the potential of an offcanvas layout pattern in Bootstrap. Try some responsive-range viewport sizes to see it in action.</p>
+          </div>
+        <table class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Entry</th>
+                  <th>Start Time</th>
+                  <th>Duration Time</th>
+                  <th>User</th>
+                  <th>Health</th>
+                  <th>Location</th>
+                  <th>IP</th>
+                  <th>Task</th>
+                    {%if is_admin%}
+                  <th>Operate</th>
+                    {%end%}
+                </tr>
+              </thead>
+              <tbody>
+                {%for data in proxy_data%}
+                    <tr>
+                        <th scope="row">{{data['index']}}</th>
+                        <td>{{data['entry']}}</td>
+                        <td>{{data['start_time']}}</td>
+                        <td>{{data['duration_time']}}</td>
+                        <td>{{data['user']}}</td>
+                        <td>{{data['health']}}</td>
+                        <td>{{data['location']}}</td>
+                        <td>{{data['ip']}}</td>
+                        <td>{{data['task']}}</td>
+                        {%if is_admin%}
+                        <td>
+                        <button type="button" name="operate_btn" id="{{data['id']}}">stop</button>
+                        </td>
+                        {%end%}
+                    </tr>
+                {%end%}
+              </tbody>
+            </table>
+          <!--<div class="row">-->
+            <!--<div class="col-xs-6 col-lg-4">-->
+              <!--<h2>Heading</h2>-->
+              <!--<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>-->
+              <!--<p><a class="btn btn-default" href="https://v3.bootcss.com/examples/offcanvas/#" role="button">View details »</a></p>-->
+            <!--</div>&lt;!&ndash;/.col-xs-6.col-lg-4&ndash;&gt;-->
+            <!--<div class="col-xs-6 col-lg-4">-->
+              <!--<h2>Heading</h2>-->
+              <!--<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>-->
+              <!--<p><a class="btn btn-default" href="https://v3.bootcss.com/examples/offcanvas/#" role="button">View details »</a></p>-->
+            <!--</div>&lt;!&ndash;/.col-xs-6.col-lg-4&ndash;&gt;-->
+            <!--<div class="col-xs-6 col-lg-4">-->
+              <!--<h2>Heading</h2>-->
+              <!--<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>-->
+              <!--<p><a class="btn btn-default" href="https://v3.bootcss.com/examples/offcanvas/#" role="button">View details »</a></p>-->
+            <!--</div>&lt;!&ndash;/.col-xs-6.col-lg-4&ndash;&gt;-->
+            <!--<div class="col-xs-6 col-lg-4">-->
+              <!--<h2>Heading</h2>-->
+              <!--<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>-->
+              <!--<p><a class="btn btn-default" href="https://v3.bootcss.com/examples/offcanvas/#" role="button">View details »</a></p>-->
+            <!--</div>&lt;!&ndash;/.col-xs-6.col-lg-4&ndash;&gt;-->
+            <!--<div class="col-xs-6 col-lg-4">-->
+              <!--<h2>Heading</h2>-->
+              <!--<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>-->
+              <!--<p><a class="btn btn-default" href="https://v3.bootcss.com/examples/offcanvas/#" role="button">View details »</a></p>-->
+            <!--</div>&lt;!&ndash;/.col-xs-6.col-lg-4&ndash;&gt;-->
+            <!--<div class="col-xs-6 col-lg-4">-->
+              <!--<h2>Heading</h2>-->
+              <!--<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>-->
+              <!--<p><a class="btn btn-default" href="https://v3.bootcss.com/examples/offcanvas/#" role="button">View details »</a></p>-->
+            <!--</div>&lt;!&ndash;/.col-xs-6.col-lg-4&ndash;&gt;-->
+          <!--</div>&lt;!&ndash;/row&ndash;&gt;-->
+        </div><!--/.col-xs-12.col-sm-9-->
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+          <div class="list-group">
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item active">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+            <a href="https://v3.bootcss.com/examples/offcanvas/#" class="list-group-item">Link</a>
+          </div>
+        </div><!--/.sidebar-offcanvas-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>© Company 2018</p>
+      </footer>
+
+    </div><!--/.container-->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body></html>

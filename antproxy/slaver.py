@@ -2,7 +2,7 @@
 # coding=utf-8
 from __future__ import print_function, unicode_literals, division, absolute_import
 
-from antproxy.common_func import *
+from common_func import *
 import argparse
 
 __author__ = "Aploium <i@z.codes>"

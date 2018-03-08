@@ -4,7 +4,7 @@ from antproxy.common_func import *
 import queue
 import atexit
 
-_listening_sockets = []  # for close at exit
+_listening_sockets = collections.deque() # for close at exit
 __author__ = "Aploium <i@z.codes>"
 __website__ = "https://github.com/aploium/shootback"
 
@@ -12,9 +12,18 @@ __website__ = "https://github.com/aploium/shootback"
 @atexit.register
 def close_listening_socket_at_exit():
     log.info("exiting...")
-    for s in _listening_sockets:
-        log.info("closing: {}".format(s))
-        try_close(s)
+    global _listening_sockets
+
+    cc = len(_listening_sockets)
+    while cc:
+        s = _listening_sockets.popleft()
+        cc -= 1
+        try:
+            log.info("closing: {}".format(s))
+            s.shutdown()
+            s.close()
+        except:
+            pass
 
 
 def try_bind_port(sock, addr):
@@ -119,26 +128,25 @@ class Master:
     def delete_proxy_server(self, customer_listen_addr, communicate_addr):
         global _listening_sockets
         _fmt_communicate_addr = fmt_addr(communicate_addr)
-        
-        if "listen_slaver-{}".format(_fmt_communicate_addr) not in self.thread_pool:
-            return
-        if "listen_customer-{}".format(_fmt_communicate_addr) not in self.thread_pool:
-            return
-        
+
         # 1.step stop listen slaver and listen customer thread
-        self.thread_pool["listen_slaver-{}".format(_fmt_communicate_addr)].stop()
-        self.thread_pool["listen_customer-{}".format(_fmt_communicate_addr)].stop()
-        
-        # not waiting to exit
+        if "listen_slaver-{}".format(_fmt_communicate_addr) in self.thread_pool:
+            self.thread_pool["listen_slaver-{}".format(_fmt_communicate_addr)].stop()
+            del self.thread_pool["listen_slaver-{}".format(_fmt_communicate_addr)]
+
+        if "listen_customer-{}".format(_fmt_communicate_addr) in self.thread_pool:
+            self.thread_pool["listen_customer-{}".format(_fmt_communicate_addr)].stop()
+            del self.thread_pool["listen_customer-{}".format(_fmt_communicate_addr)]
+
         # 2.step delete _listening_sockets record
-        keep_sockets = []
-        for index, s in enumerate(_listening_sockets):
+        cc = len(_listening_sockets)
+        while cc:
+            s = _listening_sockets.popleft()
+            cc -= 1
             if s.getsockname()[1] in [customer_listen_addr[1], communicate_addr[1]]:
                 pass
             else:
-                keep_sockets.append(s)
-        
-        _listening_sockets = keep_sockets
+                _listening_sockets.append(s)
     
     def start(self):
         self.thread_pool["heart_beat_daemon"].start()
@@ -362,7 +370,7 @@ class Master:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try_bind_port(sock, communicate_addr)
         sock.listen(10)
-        sock.settimeout(60)     # unit second
+        sock.settimeout(5)     # unit second
         _listening_sockets.append(sock)
         log.info("Listening for slavers: {}".format(fmt_addr(communicate_addr)))
         while not stop_event.isSet():
@@ -378,14 +386,21 @@ class Master:
             log.info("Got slaver {} Total: {}".format(
                 fmt_addr(addr), len(self.slaver_pool)
             ))
-        
+
+        # close socket
+        try:
+            sock.shutdown(2)
+            sock.close()
+        except:
+            pass
+
         log.info("stop listening for slavers: {}".format(fmt_addr(communicate_addr)))
         
     def _listen_customer(self, customer_listen_addr, stop_event):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try_bind_port(sock, customer_listen_addr)
         sock.listen(20)
-        sock.settimeout(60)     # unit second
+        sock.settimeout(5)     # unit second
         _listening_sockets.append(sock)
         log.info("Listening for customers: {}".format(
             fmt_addr(customer_listen_addr)))
@@ -403,7 +418,15 @@ class Master:
             # just put it into the queue,
             #   let _assign_slaver_daemon() do the else
             #   don't block this loop
+
             self.pending_customers.put((conn_customer, addr_customer))
+
+        # close socket
+        try:
+            sock.shutdown(2)
+            sock.close()
+        except:
+            pass
 
         log.info("stop listening for customer: {}".format(fmt_addr(customer_listen_addr)))
 
