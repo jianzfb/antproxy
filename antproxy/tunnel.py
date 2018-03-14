@@ -180,14 +180,19 @@ def launch_tunnel_server():
   tornado.ioloop.IOLoop.instance().start()
 
 
+def start_server():
+  parse = argparse.ArgumentParser(description="""A fast and reliable reverse TCP tunnel""")
+  parse.add_argument("-p", "--port", default=9876, required=True, help="http server")
+  args = parse.parse_args()
+
+  # 1.step listening port
+  listening_port = args.port
+  define('port', default=args.port, help="run on the given port", type=int)
+
+  # 2.step launch tunnel server
+  launch_tunnel_server()
+
+main = start_server
+
 if __name__ == '__main__':
-    parse = argparse.ArgumentParser(description="""A fast and reliable reverse TCP tunnel""")
-    parse.add_argument("-p", "--port", default=9876, required=True, help="http server")
-    args = parse.parse_args()
-
-    # 1.step listening port
-    listening_port = args.port
-    define('port', default=args.port, help="run on the given port", type=int)
-
-    # 2.step launch tunnel server
-    launch_tunnel_server()
+  main()
