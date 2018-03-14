@@ -20,14 +20,36 @@ from sqlalchemy import and_
 
 
 class ApplyProxyTaskHandler(BaseHanlder):
-  def _is_open(self, check_ip, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  def get(self):
+    user = self.get_current_user()
+    if user is None:
+      self.set_status(500)
+      self.write(json.dumps({'TIP': 'must login'}))
+      self.finish()
+      return
+
+    if not user.is_admin:
+      self.set_status(500)
+      self.write(json.dumps({'TIP': 'must be administrator'}))
+      self.finish()
+      return
+
+    query_ports = self.get_argument('query_ports', '')
     try:
-      s.connect((check_ip, int(port)))
-      s.shutdown(2)
-      return True
+      query_ports = json.loads(query_ports)
+      query_ports_open = []
+      for p in query_ports:
+        if self.is_open('127.0.0.1', p):
+          query_ports_open.append(True)
+        else:
+          query_ports_open.append(False)
+
+      self.write(json.dumps({'RES': query_ports_open}))
+      self.finish()
     except:
-      return False
+      self.set_status(500)
+      self.write(json.dumps({'TIP': 'parameter error'}))
+      self.finish()
 
   def post(self):
     user = self.get_current_user()
@@ -89,7 +111,7 @@ class ApplyProxyTaskHandler(BaseHanlder):
         odd_num = odd_num + 1
 
       odd_num = self.port_range[0] + odd_num
-      if not self._is_open('127.0.0.1', odd_num):
+      if not self.is_open('127.0.0.1', odd_num):
         is_ok = True
         break
 
@@ -130,18 +152,7 @@ class ApplyProxyTaskHandler(BaseHanlder):
                            'inner_port': inner_port}))
     self.finish()
 
-
-class StopProxyTaskHandler(BaseHanlder):
-  def _is_open(self, check_ip, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-      s.connect((check_ip, int(port)))
-      s.shutdown(2)
-      return True
-    except:
-      return False
-
-  def post(self):
+  def delete(self):
     user = self.get_current_user()
     if user is None:
       self.set_status(500)
@@ -165,7 +176,7 @@ class StopProxyTaskHandler(BaseHanlder):
       return
 
     # closing port
-    if self._is_open('127.0.0.1', outer_port) or self._is_open('127.0.0.1', outer_port+1):
+    if self.is_open('127.0.0.1', outer_port) or self.is_open('127.0.0.1', outer_port+1):
       customer_listen_addr = ('127.0.0.1', outer_port)
       communicate_listen_addr = ('127.0.0.1', outer_port+1)
       self.master_proxy.delete_proxy_server(customer_listen_addr, communicate_listen_addr)

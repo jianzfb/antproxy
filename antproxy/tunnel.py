@@ -27,6 +27,50 @@ import uuid
 from antproxy.dict2xml import *
 
 
+def scan_ports_func(db, master_proxy):
+  # scan all proxy records
+  all_proxies_records = db.query(orm.InnerNetProxy).all()
+
+  def _is_open(check_ip, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+      s.connect((check_ip, int(port)))
+      s.shutdown(2)
+      return True
+    except:
+      return False
+
+  for record in all_proxies_records:
+    # outer browser port
+    outer_port = record.output_port
+    # inner communicate port
+    inner_port = record.inner_port
+
+    output_port_is_open = _is_open('127.0.0.1', outer_port)
+    inner_port_is_open = _is_open('127.0.0.1', inner_port)
+
+    if output_port_is_open and inner_port_is_open:
+      # 1.step check whether > max time
+      if record.max_time > 0.0:
+        now_time = time.time()
+        if (now_time - record.start_time) >= record.max_time:
+          # 1.step close opening ports
+          customer_listen_addr = ('127.0.0.1', outer_port)
+          communicate_listen_addr = ('127.0.0.1', outer_port + 1)
+          master_proxy.delete_proxy_server(customer_listen_addr, communicate_listen_addr)
+
+          # 2.step delete record
+          db.delete(record)
+
+      continue
+    else:
+      # 1.step force close unhealth port ?
+      # 2.step delete record
+      db.delete(record)
+
+  db.commit()
+
+
 def init_tunnel_server():
   # 1.step initialize database
   db = scoped_session(orm.new_session_factory(url='sqlite:///antproxy.sqlite'))()
@@ -75,6 +119,7 @@ def init_users(db):
           db.commit()
 
           token = user.new_api_token()
+          db.commit()
           admin_users_dict[user_name] = token
           xml_user[2]['token'] = token
 
@@ -92,6 +137,7 @@ def init_users(db):
           db.commit()
 
           token = user.new_api_token()
+          db.commit()
           users_dict[user_name] = token
           xml_user[2]['token'] = token
 
@@ -99,7 +145,7 @@ def init_users(db):
         output_xml(dict_2_xml(xml_content, 'AntProxy'), secret_xml)
 
 
-def tunnel_server():
+def launch_tunnel_server():
   # 0.step initialize tunnel
   settings = init_tunnel_server()
 
@@ -118,13 +164,19 @@ def tunnel_server():
   users = UserDict(settings['db'], settings)
   settings.update({'users': users})
 
+  # 4.step config httpserver
   app = tornado.web.Application(handlers=[(r"/", IndexHandler),
                                           (r"/apply/", ApplyProxyTaskHandler),
-                                          (r"/stop/", StopProxyTaskHandler),
+                                          (r"/stop/", ApplyProxyTaskHandler),
+                                          (r"/isopen/", ApplyProxyTaskHandler),
                                           (r"/register/", UserRegisterAPIHandler)], **settings)
   http_server = tornado.httpserver.HTTPServer(app)
-  
   http_server.listen(options.port)
+
+  # 5.step config schedule periodically (iternal 1 hour)
+  tornado.ioloop.PeriodicCallback(functools.partial(scan_ports_func, settings['db'], settings['master_proxy']), 60*60*1000).start()
+
+  # 6.step start io loop
   tornado.ioloop.IOLoop.instance().start()
 
 
@@ -138,4 +190,4 @@ if __name__ == '__main__':
     define('port', default=args.port, help="run on the given port", type=int)
 
     # 2.step launch tunnel server
-    tunnel_server()
+    launch_tunnel_server()

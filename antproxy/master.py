@@ -411,6 +411,7 @@ class Master:
                 # ignore time out error
                 continue
               
+
             log.info("Serving customer: {} Total customers: {}".format(
                 addr_customer, self.pending_customers.qsize() + 1
             ))

@@ -22,12 +22,17 @@ class IndexHandler(BaseHanlder):
 
       data = []
       for index, p in enumerate(all_proxies):
+        is_outputport_open = self.is_open('127.0.0.1', p.output_port)
+        is_inputport_open = self.is_open('127.0.0.1', p.inner_port)
+
+        is_health = True if is_outputport_open and is_inputport_open else False
+
         content = {}
         content['entry'] = '%s:%d'%(p.output_ip, p.output_port)
         content['start_time'] = datetime.fromtimestamp(p.start_time).strftime('%Y-%m-%d %H:%M:%S')
         content['duration_time'] = 0
         content['user'] = p.user.name if p.user is not None else '-'
-        content['health'] = 'OK' if p.user_health else 'ERROR'
+        content['health'] = 'OK' if is_health else 'ERROR'
         content['location'] = ''
         content['ip'] = p.user_ip
         content['index'] = index

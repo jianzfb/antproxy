@@ -8,6 +8,7 @@ from __future__ import print_function
 import tornado.web
 from antproxy import orm
 import re
+import socket
 from tornado.log import app_log
 
 auth_header_pat = re.compile(r'^token\s+([^\s]+)$')
@@ -146,3 +147,12 @@ class BaseHanlder(tornado.web.RequestHandler):
       user = self.find_user(name)
 
     self.clear_cookie('proxy')
+
+  def is_open(self, check_ip, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+      s.connect((check_ip, int(port)))
+      s.shutdown(2)
+      return True
+    except:
+      return False
