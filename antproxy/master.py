@@ -345,8 +345,17 @@ class Master:
             if conn_slaver is None:
                 log.warning("Closing customer[{}] because no available slaver found".format(
                     addr_customer))
-                try_close(conn_customer)
 
+                # finding thread with conn_customer
+                mm = conn_customer.getsockname()
+                if "listen_customer-{}".format(fmt_addr((mm[0], mm[1]+1))) in self.thread_pool:
+                    self.thread_pool["listen_customer-{}".format(fmt_addr((mm[0], mm[1]+1)))].stop()
+                    self.thread_pool.pop("listen_customer-{}".format(fmt_addr((mm[0], mm[1]+1))))
+                if "listen_slaver-{}".format(fmt_addr((mm[0], mm[1]+1))) in self.thread_pool:
+                    self.thread_pool["listen_slaver-{}".format(fmt_addr((mm[0], mm[1]+1)))].stop()
+                    self.thread_pool.pop("listen_slaver-{}".format(fmt_addr((mm[0], mm[1]+1))))
+
+                try_close(conn_customer)
                 continue
             else:
                 log.debug("Using slaver: {} for {}".format(conn_slaver.getpeername(), addr_customer))
@@ -389,7 +398,7 @@ class Master:
 
         # close socket
         try:
-            sock.shutdown(2)
+            # sock.shutdown(2)
             sock.close()
         except:
             pass
@@ -424,7 +433,7 @@ class Master:
 
         # close socket
         try:
-            sock.shutdown(2)
+            # sock.shutdown(2)
             sock.close()
         except:
             pass
