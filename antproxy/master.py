@@ -143,10 +143,13 @@ class Master:
         while cc:
             s = _listening_sockets.popleft()
             cc -= 1
-            if s.getsockname()[1] in [customer_listen_addr[1], communicate_addr[1]]:
+            try:
+                if s.getsockname()[1] in [customer_listen_addr[1], communicate_addr[1]]:
+                    pass
+                else:
+                    _listening_sockets.append(s)
+            except:
                 pass
-            else:
-                _listening_sockets.append(s)
     
     def start(self):
         self.thread_pool["heart_beat_daemon"].start()
@@ -213,7 +216,7 @@ class Master:
             # ---------------------- preparation -----------------------
             slaver_count = len(self.slaver_pool)
             if not slaver_count:
-                log.warning("heart_beat_daemon: sorry, no slaver available, keep sleeping")
+                # log.warning("heart_beat_daemon: sorry, no slaver available, keep sleeping")
                 # restore default delay if there is no slaver
                 delay = default_delay
                 continue

@@ -6,5 +6,5 @@ from __future__ import division
 from __future__ import unicode_literals
 from __future__ import print_function
 from antproxy import *
-from antproxy.tunnel import main
+from antproxy.main import main
 main()

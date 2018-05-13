@@ -39,6 +39,11 @@ class BaseHanlder(tornado.web.RequestHandler):
   def port_range(self):
     return self.settings.get('port_range', None)
 
+  @property
+  def host_ip(self):
+    return self.settings.get('host_ip', '127.0.0.1')
+
+
   def finish(self, *args, **kwargs):
     """Roll back any uncommitted transactions from the handler."""
     self.db.rollback()

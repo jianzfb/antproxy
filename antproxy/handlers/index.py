@@ -22,8 +22,8 @@ class IndexHandler(BaseHanlder):
 
       data = []
       for index, p in enumerate(all_proxies):
-        is_outputport_open = self.is_open('127.0.0.1', p.output_port)
-        is_inputport_open = self.is_open('127.0.0.1', p.inner_port)
+        is_outputport_open = self.is_open('192.168.1.102', p.output_port)
+        is_inputport_open = self.is_open('192.168.1.102', p.inner_port)
 
         is_health = True if is_outputport_open and is_inputport_open else False
 

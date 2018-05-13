@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # @Time    : 18-1-17
-# @File    : tunnel.py
+# @File    : main.py
 # @Author  : 
 from __future__ import division
 from __future__ import unicode_literals
@@ -28,47 +28,48 @@ from antproxy.dict2xml import *
 
 
 def scan_ports_func(db, master_proxy):
-  # scan all proxy records
-  all_proxies_records = db.query(orm.InnerNetProxy).all()
-
-  def _is_open(check_ip, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-      s.connect((check_ip, int(port)))
-      s.shutdown(2)
-      return True
-    except:
-      return False
-
-  for record in all_proxies_records:
-    # outer browser port
-    outer_port = record.output_port
-    # inner communicate port
-    inner_port = record.inner_port
-
-    output_port_is_open = _is_open('127.0.0.1', outer_port)
-    inner_port_is_open = _is_open('127.0.0.1', inner_port)
-
-    if output_port_is_open and inner_port_is_open:
-      # 1.step check whether > max time
-      if record.max_time > 0.0:
-        now_time = time.time()
-        if (now_time - record.start_time) >= record.max_time:
-          # 1.step close opening ports
-          customer_listen_addr = ('127.0.0.1', outer_port)
-          communicate_listen_addr = ('127.0.0.1', outer_port + 1)
-          master_proxy.delete_proxy_server(customer_listen_addr, communicate_listen_addr)
-
-          # 2.step delete record
-          db.delete(record)
-
-      continue
-    else:
-      # 1.step force close unhealth port ?
-      # 2.step delete record
-      db.delete(record)
-
-  db.commit()
+  pass
+  # # scan all proxy records
+  # all_proxies_records = db.query(orm.InnerNetProxy).all()
+  #
+  # def _is_open(check_ip, port):
+  #   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  #   try:
+  #     s.connect((check_ip, int(port)))
+  #     s.shutdown(2)
+  #     return True
+  #   except:
+  #     return False
+  #
+  # for record in all_proxies_records:
+  #   # outer browser port
+  #   outer_port = record.output_port
+  #   # inner communicate port
+  #   inner_port = record.inner_port
+  #
+  #   output_port_is_open = _is_open('192.168.1.102', outer_port)
+  #   inner_port_is_open = _is_open('192.168.1.102', inner_port)
+  #
+  #   if output_port_is_open and inner_port_is_open:
+  #     # 1.step check whether > max time
+  #     if record.max_time > 0.0:
+  #       now_time = time.time()
+  #       if (now_time - record.start_time) >= record.max_time:
+  #         # 1.step close opening ports
+  #         customer_listen_addr = ('192.168.1.102', outer_port)
+  #         communicate_listen_addr = ('192.168.1.102', outer_port + 1)
+  #         master_proxy.delete_proxy_server(customer_listen_addr, communicate_listen_addr)
+  #
+  #         # 2.step delete record
+  #         db.delete(record)
+  #
+  #     continue
+  #   else:
+  #     # 1.step force close unhealth port ?
+  #     # 2.step delete record
+  #     db.delete(record)
+  #
+  # db.commit()
 
 
 def init_tunnel_server():
@@ -92,7 +93,11 @@ def init_tunnel_server():
     port_range[0] = int(port_r[0])
     port_range[1] = int(port_r[1])
 
-  settings = {'db': db, 'port_range': port_range}
+  host_ip = '127.0.0.1'
+  if 'host' in xml_content:
+    host_ip = xml_content['host'][0][1]
+
+  settings = {'db': db, 'port_range': port_range, 'host_ip': host_ip}
   return settings
 
 

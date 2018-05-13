@@ -18,8 +18,9 @@ import json
 class UserRegisterAPIHandler(BaseHanlder):
   @gen.coroutine
   def post(self):
-    user = self.get_current_user()
-    if not user.orm_user.is_admin:
+    applicant = self.get_current_user()
+    if not applicant.is_admin:
+      self.log.error('no admin user call')
       self.set_status(500)
       self.finish()
       return
@@ -28,15 +29,9 @@ class UserRegisterAPIHandler(BaseHanlder):
     # check user name unique
     user = self.db.query(orm.User).filter(orm.User.name==user_name).one_or_none()
     if user is not None:
+      self.log.error('has existed user %s'%user_name)
       self.set_status(401)
       self.write(json.dumps({'TIP': 'user name not unique'}))
-      self.finish()
-      return
-
-    user_token = self.get_argument('token', None)
-    if user_token is None:
-      self.set_status(401)
-      self.write(json.dumps({'TIP': 'must set user token'}))
       self.finish()
       return
 
@@ -44,8 +39,36 @@ class UserRegisterAPIHandler(BaseHanlder):
     self.db.add(user)
     self.db.commit()
 
-    user.new_api_token(token=user_token)
+    user_token = self.get_argument('token', None)
+    if user_token is None:
+      self.log.info('use proxy inner token')
+      user.new_api_token()
+    else:
+      self.log.info('user outer authorizied token')
+      user.new_api_token(token=user_token)
     self.db.commit()
 
     self.write(json.dumps({'RES': 'success'}))
     self.finish()
+
+  @gen.coroutine
+  def delete(self):
+    applicant = self.get_current_user()
+    if not applicant.orm_user.is_admin:
+      self.log.error('no admin user call')
+      self.set_status(500)
+      self.finish()
+      return
+
+    user_name = self.get_argument('username', '')
+    # check user name unique
+    user = self.db.query(orm.User).filter(orm.User.name==user_name).one_or_none()
+
+    if user is None:
+      self.log.error('no user %s'%user_name)
+      self.set_status(401)
+      self.finish()
+      return
+
+    self.db.delete(user)
+    self.db.commit()

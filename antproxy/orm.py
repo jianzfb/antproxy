@@ -166,6 +166,8 @@ class InnerNetProxy(Base):
   task_type = Column(Unicode(1024), default='')
   task_description = Column(Unicode(1024), default='')
 
+  server_name = Column(Unicode(1024), default='')
+
   @declared_attr
   def user_id(cls):
     return Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=True)
